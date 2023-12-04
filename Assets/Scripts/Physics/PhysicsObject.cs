@@ -7,6 +7,7 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D))]
 public class PhysicsObject : MonoBehaviour
 {
+    [Header("PhysicsObject")]
     public float minGroundNormalY = 0.65f; //the max angle between a physicsObject and a slope, that will count as grounded. between 0 and 1
     public float gravityModifier = 1f;
     public float terminalVelocityY = 80f; //how much an object is allowed to move on the y axis in units pr. second
