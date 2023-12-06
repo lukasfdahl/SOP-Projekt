@@ -29,6 +29,8 @@ public class PlayerController : PhysicsObject
 
         input.Player.Jump.started += Jump;
         input.Player.Jump.canceled += JumpCancel;
+
+        AddOnTagCollisionEnterEvent("Spike", OnSpikeHit);
     }
 
     private void Update()
@@ -155,5 +157,10 @@ public class PlayerController : PhysicsObject
     {
         yield return new WaitForSeconds(jumpQueueTime);
         isJumpQueued = false;
+    }
+
+    public void OnSpikeHit(RaycastHit2D hit)
+    {
+        Debug.Log("HitSpike");
     }
 }
