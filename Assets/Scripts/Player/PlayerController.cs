@@ -1,6 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -23,9 +21,7 @@ public class PlayerController : PhysicsObject
     private bool isRunningCoyoteTime = false;
 
     private bool isJumpQueued = false;
-    private bool isRunningJumpQueue = false;
 
-    // Start is called before the first frame update
     void Start()
     {
         input = new PlayerInput();
@@ -55,7 +51,6 @@ public class PlayerController : PhysicsObject
             //jump Queuing
             if (isJumpQueued)
             {
-                isRunningJumpQueue = false;
                 StopCoroutine(JumpQueueTimer());
                 Jump();
             }
@@ -79,7 +74,6 @@ public class PlayerController : PhysicsObject
         else
         {
             isJumpQueued = true;
-            isRunningJumpQueue = true;
             StartCoroutine(JumpQueueTimer());
 
         }
@@ -94,7 +88,6 @@ public class PlayerController : PhysicsObject
         else
         {
             isJumpQueued = true;
-            isRunningJumpQueue = true;
             StartCoroutine(JumpQueueTimer());
 
         }
@@ -162,6 +155,5 @@ public class PlayerController : PhysicsObject
     {
         yield return new WaitForSeconds(jumpQueueTime);
         isJumpQueued = false;
-        isRunningJumpQueue = false;
     }
 }

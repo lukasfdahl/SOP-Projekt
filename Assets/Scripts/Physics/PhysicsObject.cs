@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 [RequireComponent(typeof(Collider2D))]
@@ -21,7 +20,7 @@ public class PhysicsObject : MonoBehaviour
     protected Vector2 velocity;
     protected ContactFilter2D contactFilter; //used to handle collisions when layers are involved
     protected RaycastHit2D[] hitBuffer = new RaycastHit2D[16]; 
-    protected List<RaycastHit2D> hitBufferList = new List<RaycastHit2D>(); //only has the RaycastHit2Ds that hit somthing
+    protected List<RaycastHit2D> hitBufferList = new List<RaycastHit2D>(); //only has the RaycastHit2Ds that hit something
 
     protected const float minMoveDistance = 0.001f;
     protected const float shellRadius = 0.01f; //the padding between 2 colliders. It prevents colliders from getting stuck in each other
@@ -42,6 +41,8 @@ public class PhysicsObject : MonoBehaviour
 
         foreach (Collider2D collider in colliders)
         {
+            OnCollision(collider);
+
             float currentBottom = collider.bounds.min.y - transform.position.y;
             if (currentBottom < relativeBottomY)
             {
@@ -53,7 +54,7 @@ public class PhysicsObject : MonoBehaviour
 
     private void FixedUpdate()
     {
-        velocity += gravityModifier * Physics2D.gravity * Time.deltaTime; //adds gravity to an object
+        velocity += gravityModifier * Physics2D.gravity * Level.current.gravity * Time.deltaTime; //adds gravity to an object
         velocity.x = targetVelocity.x; //adds horizontal movement to object
 
         grounded = false;
@@ -152,6 +153,11 @@ public class PhysicsObject : MonoBehaviour
         #endregion
 
         rb2d.position = rb2d.position + moveAmount.normalized * distance;
+
+    }
+
+    protected virtual void OnCollision(Collider2D other)
+    {
 
     }
 }
