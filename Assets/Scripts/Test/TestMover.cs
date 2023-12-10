@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TestMover : PhysicsObject
+public class TestMover : GravityObject
 {
     public float speed = 5f;
 

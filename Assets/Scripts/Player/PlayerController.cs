@@ -2,14 +2,14 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerController : PhysicsObject
+public class PlayerController : GravityObject
 {
     [Header("PlayerController")]
     public float maxSpeed = 6f;
     public float acceleration = 6f;
     public float slipCorrection = 6f;
     public float turnAroundRate = 3f;
-    public float jumpSpeed = 15f;
+    public float InitialJumpSpeed = 15f;
     public float coyoteTime = 0.1f;
     public float jumpQueueTime = 0.1f;
     [Range(0,1)]public float jumpCancelRate = 0.5f;
@@ -19,8 +19,13 @@ public class PlayerController : PhysicsObject
 
     private bool canJump = false;
     private bool isRunningCoyoteTime = false;
+    private bool isJumping;
 
     private bool isJumpQueued = false;
+
+    //Testing
+    public float normalGravity;
+    public float cancelGravity;
 
     void Start()
     {
@@ -46,6 +51,8 @@ public class PlayerController : PhysicsObject
         //Coyote Time
         if (grounded)
         {
+            isJumping = false;
+            gravityModifier = normalGravity;
             canJump = true;
             isRunningCoyoteTime = false;
             StopCoroutine(CoyoteTimer());
@@ -58,7 +65,14 @@ public class PlayerController : PhysicsObject
             }
             
         }
-        else {
+        else
+        {
+            //for at have højere tyngdekræft når man falder fra et hop
+            if (isJumping && velocity.y < 0)
+            {
+                gravityModifier = cancelGravity;
+            }
+
             if (!isRunningCoyoteTime)
             {
                 StartCoroutine(CoyoteTimer());
@@ -68,24 +82,15 @@ public class PlayerController : PhysicsObject
 
     private void Jump(InputAction.CallbackContext callbackContext)
     {
-        if (canJump)
-        {
-            canJump = false;
-            velocity.y = jumpSpeed;
-        }
-        else
-        {
-            isJumpQueued = true;
-            StartCoroutine(JumpQueueTimer());
-
-        }
+        Jump();
     }
     private void Jump()
     {
         if (canJump)
         {
             canJump = false;
-            velocity.y = jumpSpeed;
+            isJumping = true;
+            velocity.y = InitialJumpSpeed;
         }
         else
         {
@@ -100,6 +105,7 @@ public class PlayerController : PhysicsObject
         if (velocity.y > 0)
         {
             velocity.y = velocity.y * jumpCancelRate;
+            gravityModifier = cancelGravity;
         }
     }
 

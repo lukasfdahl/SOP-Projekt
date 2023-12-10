@@ -1678,10 +1678,12 @@ MonoBehaviour:
   acceleration: 6
   slipCorrection: 6
   turnAroundRate: 3
-  jumpSpeed: 15
+  InitialJumpSpeed: 16
   coyoteTime: 0.1
   jumpQueueTime: 0.075
   jumpCancelRate: 0.5
+  normalGravity: 4
+  cancelGravity: 6
 --- !u!1 &472226355
 GameObject:
   m_ObjectHideFlags: 0
