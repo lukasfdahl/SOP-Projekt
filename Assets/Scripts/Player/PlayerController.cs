@@ -34,8 +34,6 @@ public class PlayerController : GravityObject
 
         input.Player.Jump.started += Jump;
         input.Player.Jump.canceled += JumpCancel;
-
-        AddOnTagCollisionEnterEvent("Spike", OnSpikeHit);
     }
 
     private void Update()
@@ -165,8 +163,9 @@ public class PlayerController : GravityObject
         isJumpQueued = false;
     }
 
-    public void OnSpikeHit(RaycastHit2D hit)
+    public void Respawn(Vector3 respawnPosition)
     {
-        Debug.Log("HitSpike");
+        transform.position = respawnPosition;
+        velocity = Vector2.zero;
     }
 }

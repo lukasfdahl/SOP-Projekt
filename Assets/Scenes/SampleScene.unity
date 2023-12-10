@@ -1514,7 +1514,7 @@ GameObject:
   - component: {fileID: 432553233}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1921,7 +1921,7 @@ Camera:
   far clip plane: 1000
   field of view: 7.152669
   orthographic: 1
-  orthographic size: 4.35
+  orthographic size: 8
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -1946,7 +1946,7 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.00000011920929, z: -10}
+  m_LocalPosition: {x: 0, y: -0.00000023841858, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2105,7 +2105,6 @@ Transform:
   - {fileID: 472226358}
   - {fileID: 1371058708}
   - {fileID: 904123405}
-  - {fileID: 939009329}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &712242130
@@ -2871,6 +2870,8 @@ GameObject:
   - component: {fileID: 939009329}
   - component: {fileID: 939009331}
   - component: {fileID: 939009330}
+  - component: {fileID: 939009333}
+  - component: {fileID: 939009332}
   m_Layer: 0
   m_Name: Spike
   m_TagString: Spike
@@ -2891,7 +2892,7 @@ Transform:
   m_LocalScale: {x: 4.0979, y: 0.17, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 658606036}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!61 &939009330
 BoxCollider2D:
@@ -2990,6 +2991,31 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &939009332
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 939009328}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6ba0641c0a4b2847bf22aa38f91bbfd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  respawnPoint: {fileID: 1454273616}
+--- !u!114 &939009333
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 939009328}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a8d7ff3801e6e84ebba15dd1fb673d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &945589450
 GameObject:
   m_ObjectHideFlags: 3
@@ -4208,6 +4234,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 658606036}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 27.027}
+--- !u!1 &1454273615
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1454273616}
+  m_Layer: 0
+  m_Name: SpawnPoint1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1454273616
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1454273615}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 44, y: 5, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1528637652
 GameObject:
   m_ObjectHideFlags: 0
@@ -4942,7 +4999,7 @@ MonoBehaviour:
   m_Follow: {fileID: 432553231}
   m_Lens:
     FieldOfView: 7.152669
-    OrthographicSize: 4.35
+    OrthographicSize: 8
     NearClipPlane: 0.3
     FarClipPlane: 1000
     Dutch: 0
@@ -4968,7 +5025,7 @@ Transform:
   m_GameObject: {fileID: 1659401691}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.00000011920929, z: -10}
+  m_LocalPosition: {x: 0, y: -0.00000023841858, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -6252,3 +6309,5 @@ SceneRoots:
   - {fileID: 658606036}
   - {fileID: 230709401}
   - {fileID: 412079517}
+  - {fileID: 1454273616}
+  - {fileID: 939009329}

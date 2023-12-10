@@ -30,18 +30,8 @@ public class GravityObject : PhysicsObject
     protected float relativeBottomY = float.MaxValue; //the lowest y point on the GravityObject in relation to the position of the GravityObject
 
     #region collision Actions
-    //collision actions
-    public Action<RaycastHit2D> onCollisionEnter;
-    public Action<RaycastHit2D> onCollisionStay;
-    public Action<RaycastHit2D> onCollisionExit;
-
-    //collision with hitTag actions
-    public Dictionary<string, Action<RaycastHit2D>> onTagCollisionEnter = new Dictionary<string, Action<RaycastHit2D>>();
-    public Dictionary<string, Action<RaycastHit2D>> onTagCollisionStay = new Dictionary<string, Action<RaycastHit2D>>();
-    public Dictionary<string, Action<RaycastHit2D>> onTagCollisionExit = new Dictionary<string, Action<RaycastHit2D>>();
-
-    protected List<RaycastHit2D> currentHits = new List<RaycastHit2D>();
-    protected List<RaycastHit2D> prevHits = new List<RaycastHit2D>();
+    protected List<GameObject> currentHits = new List<GameObject>();
+    protected List<GameObject> prevHits = new List<GameObject>();
     #endregion
 
 
@@ -69,14 +59,15 @@ public class GravityObject : PhysicsObject
 
     private void FixedUpdate()
     {
-        velocity += gravityModifier * Physics2D.gravity * Level.current.gravity * Time.deltaTime; //adds gravity to an object
-        velocity.x = targetVelocity.x; //adds horizontal movement to object
+        velocity += gravityModifier * Physics2D.gravity * Level.current.gravity * Time.deltaTime; //udregner tyngdekræften for objektet
+        velocity.x = targetVelocity.x; //tilføjer horizontal bevægelse baseret på targetVelocity
 
-        grounded = false;
+        grounded = false; //er sat flask her, og så sat sandt i Movement hvis spilleren kollidere med jorden
 
-        Vector2 moveAlongGround = new Vector2(groundNormal.y, -groundNormal.x); //finds the cross vector to ground normal (this line goes along the slope of the surface)
-        Vector2 deltaPosition = velocity * Time.deltaTime; //the change in position due to velocity
+        Vector2 moveAlongGround = new Vector2(groundNormal.y, -groundNormal.x); //finder tværvektoren til jordens normal vektor (linjen der går langs en overflade)
+        Vector2 deltaPosition = velocity * Time.deltaTime; //ændrigen der skal ske i position pga. velocity, denne frame
 
+        //X og Y movement er håndteret seperart fordi det gør det nemmere at håndtere slopes. dog er det i en funktion da de stadig deler meget af den samme kode
         //X movement
         Vector2 moveAmount = moveAlongGround * deltaPosition.x;
         Movement(moveAmount, false);
@@ -102,10 +93,10 @@ public class GravityObject : PhysicsObject
     }
 
     /// <summary>
-    /// handles the movement of a GravityObject
+    /// håndtere bevægelse af GravityObject
     /// </summary>
-    /// <param name="moveAmount">the amount the object should move</param>
-    /// <param name="yMovement">true if the given move vector is for the y axis, otherwise false</param>
+    /// <param name="moveAmount">mængden den skal bevæge sig</param>
+    /// <param name="yMovement">sand hvis det er den skal udregene bevægelse på y aksen, ellers er den falsk</param>
     protected virtual void Movement(Vector2 moveAmount, bool yMovement)
     {
         #region CollisionCheck
@@ -114,7 +105,7 @@ public class GravityObject : PhysicsObject
 
         if (distance > minMoveDistance)
         {
-            int count = rb2d.Cast(moveAmount, contactFilter, hitBuffer, distance + shellRadius); //casts all coliders attached to a rigidbody in a given direction
+            int count = rb2d.Cast(moveAmount, contactFilter, hitBuffer, distance + shellRadius); //caster alle en rigdigdbodys collidere i en hvis renting med en hvis mængde
             hitBufferList.Clear();
             for (int i = 0; i < count; i++)
             {
@@ -126,7 +117,7 @@ public class GravityObject : PhysicsObject
 
             foreach (RaycastHit2D hit in hitBufferList)
             {
-                currentHits.Add(hit);
+                currentHits.Add(hit.collider.gameObject);
 
                 Vector2 currentNormal = hit.normal;
                 float hitY = hit.point.y - transform.position.y;
@@ -138,7 +129,7 @@ public class GravityObject : PhysicsObject
                         groundNormal = currentNormal;
                         currentNormal.x = 0;
                     }
-                    //for stepping over bumps smaler than shell radius
+                    //for at håndtere setpping over bump der er mindre end shellRadius
                     else if (hitY - relativeBottomY + shellRadius > 0)
                     {
                         rb2d.position += new Vector2(0, hitY - relativeBottomY + shellRadius + 0.01f);
@@ -146,17 +137,23 @@ public class GravityObject : PhysicsObject
                     }
                 }
 
-                //for stepping up
+                //for at håndtere generel stepping 
                 else if (hitY - relativeBottomY + shellRadius > 0 && hitY - relativeBottomY + shellRadius < stepHeight)
                 {
                     rb2d.position += new Vector2(0, hitY - relativeBottomY + shellRadius + stepExtra);
                     currentNormal = Vector2.up;
                 }
 
-                //to handle a physicsObject colliding with a sloped roof, and make it slide along, instead of stopping completly
+                //hvis man kollidere med tag som er en slope, så glider man langs det istedet for at man mister alt momentum og falder ned.
+                //her bruger jeg skalarprodukt til at finde længden af velocity projekteret på currentnormal
+                //hvis projektionen er negativ betyder det at der er kollideret med en skrå overflade
+                //her fjerner jeg så momentum baseret på projectionen så de ikke ryger igennem taget
                 float projection = Vector2.Dot(velocity, currentNormal);
                 if (projection < 0)
                 {
+                    Debug.DrawRay(transform.position, velocity, Color.blue, velocity.magnitude);
+                    Debug.DrawRay(transform.position, new Vector2(), Color.blue, velocity.magnitude);
+
                     velocity = velocity - projection * currentNormal;
                 }
 
@@ -177,20 +174,23 @@ public class GravityObject : PhysicsObject
         if (yMovement)
         {
             //for at få en liste af alle de kollidere der var collideret med sidste update
-            List<Collider2D> prevCollisions = new List<Collider2D>();
-            foreach (RaycastHit2D hit in prevHits)
+            List<GameObject> prevCollisions = new List<GameObject>();
+            foreach (GameObject hit in prevHits)
             {
-                prevCollisions.Add(hit.collider);
+                prevCollisions.Add(hit);
             }
 
 
-
-            foreach (RaycastHit2D hit in currentHits)
+            foreach (GameObject hit in currentHits)
             {
-                string hitTag = hit.collider.tag;
+                string hitTag = hit.tag;
 
-                if (prevCollisions.Contains(hit.collider))
+                PhysicsObject other = hit.GetComponent<PhysicsObject>();
+                bool isCollidingWithPhysicsObject = other != null;
+
+                if (prevCollisions.Contains(hit))
                 {
+                    //kollsion for dette objeckt
                     //for at køre hitTag kollisions systemet
                     if (onTagCollisionStay.ContainsKey(hitTag))
                     {
@@ -199,8 +199,24 @@ public class GravityObject : PhysicsObject
                     //for at køre normal kollision
                     if (onCollisionStay != null)
                         onCollisionStay(hit);
+
+
+                    //kollsion for det den rammer
+                    if (isCollidingWithPhysicsObject)
+                    {
+                        //for at køre hitTag kollisions systemet
+                        if (other.onTagCollisionStay.ContainsKey(tag))
+                        {
+                            other.onTagCollisionStay[tag](gameObject);
+                        }
+                        //for at køre normal kollision
+                        if (other.onCollisionStay != null)
+                            other.onCollisionStay(gameObject);
+                    }
+
+
                     prevHits.Remove(hit);
-                    prevCollisions.Remove(hit.collider);
+                    prevCollisions.Remove(hit);
                 }
                 else
                 {
@@ -213,15 +229,31 @@ public class GravityObject : PhysicsObject
                     //for at køre normal kollision
                     if (onCollisionEnter != null)
                         onCollisionEnter(hit);
+
+
+                    if (isCollidingWithPhysicsObject)
+                    {
+                        //for at køre hitTag kollisions systemet
+                        if (other.onTagCollisionEnter.ContainsKey(tag))
+                        {
+                            other.onTagCollisionEnter[tag](gameObject);
+                        }
+                        //for at køre normal kollision
+                        if (other.onCollisionEnter != null)
+                            other.onCollisionEnter(gameObject);
+                    }
                 }
             }
 
-            foreach (RaycastHit2D hit in prevHits)
+            foreach (GameObject hit in prevHits)
             {
                 //for at sikre at exit kun bliver kørt hvis objektet forlader kollideren fuldkommen. køre ikke hvis det bare er hit pisitionen der ændre sig
-                if (prevCollisions.Contains(hit.collider))
+                if (prevCollisions.Contains(hit))
                 {
-                    string hitTag = hit.collider.tag;
+                    string hitTag = hit.tag;
+
+                    PhysicsObject other = hit.GetComponent<PhysicsObject>();
+                    bool isCollidingWithPhysicsObject = other != null;
 
                     //for at køre hitTag kollisions systemet
                     if (onTagCollisionExit.ContainsKey(hitTag))
@@ -232,10 +264,23 @@ public class GravityObject : PhysicsObject
                     //for at køre normal kollision
                     if (onCollisionExit != null)
                         onCollisionExit(hit);
+
+
+                    if (isCollidingWithPhysicsObject)
+                    {
+                        //for at køre hitTag kollisions systemet
+                        if (other.onTagCollisionExit.ContainsKey(tag))
+                        {
+                            other.onTagCollisionExit[tag](gameObject);
+                        }
+                        //for at køre normal kollision
+                        if (other.onCollisionExit != null)
+                            other.onCollisionExit(gameObject);
+                    }
                 }
             }
 
-            prevHits = new List<RaycastHit2D>(currentHits);
+            prevHits = new List<GameObject>(currentHits);
         }
 
         #endregion
@@ -244,34 +289,4 @@ public class GravityObject : PhysicsObject
         rb2d.position = rb2d.position + moveAmount.normalized * distance;
 
     }
-
-    #region collision Actions
-
-    private void AddAction(Dictionary<string, Action<RaycastHit2D>> actionDictionary, string key, Action<RaycastHit2D> action)
-    {
-        if (actionDictionary.ContainsKey(key)) 
-        {
-            actionDictionary[key] += action;
-        }
-        else
-        {
-            actionDictionary.Add(key, action);
-        }
-    }
-    private void RemoveAction(Dictionary<string, Action<RaycastHit2D>> actionDictionary, string key, Action<RaycastHit2D> action)
-    {
-        actionDictionary[key] -= action;
-    }
-
-    //adding
-    public void AddOnTagCollisionEnterEvent(string tag, Action<RaycastHit2D> action) { AddAction(onTagCollisionEnter, tag, action); }
-    public void AddOnTagCollisionStayEvent(string tag, Action<RaycastHit2D> action) { AddAction(onTagCollisionStay, tag, action); }
-    public void AddOnTagCollisionExitEvent(string tag, Action<RaycastHit2D> action) { AddAction(onTagCollisionExit, tag, action); }
-
-    //removing
-    public void RemoveOnTagCollisionEnterEvent(string tag, Action<RaycastHit2D> action) { RemoveAction(onTagCollisionEnter, tag, action); }
-    public void RemoveOnTagCollisionStayEvent(string tag, Action<RaycastHit2D> action) { RemoveAction(onTagCollisionStay, tag, action); }
-    public void RemoveOnTagCollisionExitEvent(string tag, Action<RaycastHit2D> action) { RemoveAction(onTagCollisionExit, tag, action); }
-
-    #endregion
 }
