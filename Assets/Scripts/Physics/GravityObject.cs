@@ -151,9 +151,6 @@ public class GravityObject : PhysicsObject
                 float projection = Vector2.Dot(velocity, currentNormal);
                 if (projection < 0)
                 {
-                    Debug.DrawRay(transform.position, velocity, Color.blue, velocity.magnitude);
-                    Debug.DrawRay(transform.position, new Vector2(), Color.blue, velocity.magnitude);
-
                     velocity = velocity - projection * currentNormal;
                 }
 
@@ -170,113 +167,110 @@ public class GravityObject : PhysicsObject
 
 
         #region collisionActions
-        //for at sørge for den ikke køre 2 gange pr. fixed update
-        if (yMovement)
+        //for at få en liste af alle de kollidere der var collideret med sidste update
+        List<GameObject> prevCollisions = new List<GameObject>();
+
+        foreach (GameObject hit in prevHits)
         {
-            //for at få en liste af alle de kollidere der var collideret med sidste update
-            List<GameObject> prevCollisions = new List<GameObject>();
-            foreach (GameObject hit in prevHits)
+            prevCollisions.Add(hit);
+        }
+
+
+        foreach (GameObject hit in currentHits)
+        {
+            string hitTag = hit.tag;
+
+            PhysicsObject other = hit.GetComponent<PhysicsObject>();
+            bool isCollidingWithPhysicsObject = other != null;
+
+            if (prevCollisions.Contains(hit))
             {
-                prevCollisions.Add(hit);
+                //kollsion for dette objeckt
+                //for at køre hitTag kollisions systemet
+                if (onTagCollisionStay.ContainsKey(hitTag))
+                {
+                    onTagCollisionStay[hitTag](hit);
+                }
+                //for at køre normal kollision
+                if (onCollisionStay != null)
+                    onCollisionStay(hit);
+
+
+                //kollsion for det den rammer
+                if (isCollidingWithPhysicsObject)
+                {
+                    //for at køre hitTag kollisions systemet
+                    if (other.onTagCollisionStay.ContainsKey(tag))
+                    {
+                        other.onTagCollisionStay[tag](gameObject);
+                    }
+                    //for at køre normal kollision
+                    if (other.onCollisionStay != null)
+                        other.onCollisionStay(gameObject);
+                }
+
+
+                prevHits.Remove(hit);
+                prevCollisions.Remove(hit);
             }
+            else
+            {
+                //for at køre hitTag kollisions systemet
+                if (onTagCollisionEnter.ContainsKey(hitTag))
+                {
+                    onTagCollisionEnter[hitTag](hit);
+                }
+
+                //for at køre normal kollision
+                if (onCollisionEnter != null)
+                    onCollisionEnter(hit);
 
 
-            foreach (GameObject hit in currentHits)
+                if (isCollidingWithPhysicsObject)
+                {
+                    //for at køre hitTag kollisions systemet
+                    if (other.onTagCollisionEnter.ContainsKey(tag))
+                    {
+                        other.onTagCollisionEnter[tag](gameObject);
+                    }
+                    //for at køre normal kollision
+                    if (other.onCollisionEnter != null)
+                        other.onCollisionEnter(gameObject);
+                }
+            }
+        }
+
+        foreach (GameObject hit in prevHits)
+        {
+            //for at sikre at exit kun bliver kørt hvis objektet forlader kollideren fuldkommen. køre ikke hvis det bare er hit pisitionen der ændre sig
+            if (prevCollisions.Contains(hit))
             {
                 string hitTag = hit.tag;
 
                 PhysicsObject other = hit.GetComponent<PhysicsObject>();
                 bool isCollidingWithPhysicsObject = other != null;
 
-                if (prevCollisions.Contains(hit))
+                //for at køre hitTag kollisions systemet
+                if (onTagCollisionExit.ContainsKey(hitTag))
                 {
-                    //kollsion for dette objeckt
-                    //for at køre hitTag kollisions systemet
-                    if (onTagCollisionStay.ContainsKey(hitTag))
-                    {
-                        onTagCollisionStay[hitTag](hit);
-                    }
-                    //for at køre normal kollision
-                    if (onCollisionStay != null)
-                        onCollisionStay(hit);
-
-
-                    //kollsion for det den rammer
-                    if (isCollidingWithPhysicsObject)
-                    {
-                        //for at køre hitTag kollisions systemet
-                        if (other.onTagCollisionStay.ContainsKey(tag))
-                        {
-                            other.onTagCollisionStay[tag](gameObject);
-                        }
-                        //for at køre normal kollision
-                        if (other.onCollisionStay != null)
-                            other.onCollisionStay(gameObject);
-                    }
-
-
-                    prevHits.Remove(hit);
-                    prevCollisions.Remove(hit);
+                    onTagCollisionExit[hitTag](hit);
                 }
-                else
+
+                //for at køre normal kollision
+                if (onCollisionExit != null)
+                    onCollisionExit(hit);
+
+
+                if (isCollidingWithPhysicsObject)
                 {
                     //for at køre hitTag kollisions systemet
-                    if (onTagCollisionEnter.ContainsKey(hitTag))
+                    if (other.onTagCollisionExit.ContainsKey(tag))
                     {
-                        onTagCollisionEnter[hitTag](hit);
+                        other.onTagCollisionExit[tag](gameObject);
                     }
-
                     //for at køre normal kollision
-                    if (onCollisionEnter != null)
-                        onCollisionEnter(hit);
-
-
-                    if (isCollidingWithPhysicsObject)
-                    {
-                        //for at køre hitTag kollisions systemet
-                        if (other.onTagCollisionEnter.ContainsKey(tag))
-                        {
-                            other.onTagCollisionEnter[tag](gameObject);
-                        }
-                        //for at køre normal kollision
-                        if (other.onCollisionEnter != null)
-                            other.onCollisionEnter(gameObject);
-                    }
-                }
-            }
-
-            foreach (GameObject hit in prevHits)
-            {
-                //for at sikre at exit kun bliver kørt hvis objektet forlader kollideren fuldkommen. køre ikke hvis det bare er hit pisitionen der ændre sig
-                if (prevCollisions.Contains(hit))
-                {
-                    string hitTag = hit.tag;
-
-                    PhysicsObject other = hit.GetComponent<PhysicsObject>();
-                    bool isCollidingWithPhysicsObject = other != null;
-
-                    //for at køre hitTag kollisions systemet
-                    if (onTagCollisionExit.ContainsKey(hitTag))
-                    {
-                        onTagCollisionExit[hitTag](hit);
-                    }
-
-                    //for at køre normal kollision
-                    if (onCollisionExit != null)
-                        onCollisionExit(hit);
-
-
-                    if (isCollidingWithPhysicsObject)
-                    {
-                        //for at køre hitTag kollisions systemet
-                        if (other.onTagCollisionExit.ContainsKey(tag))
-                        {
-                            other.onTagCollisionExit[tag](gameObject);
-                        }
-                        //for at køre normal kollision
-                        if (other.onCollisionExit != null)
-                            other.onCollisionExit(gameObject);
-                    }
+                    if (other.onCollisionExit != null)
+                        other.onCollisionExit(gameObject);
                 }
             }
 
