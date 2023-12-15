@@ -20,7 +20,6 @@ public class GravityObject : PhysicsObject
     protected Rigidbody2D rb2d;
     protected Vector2 velocity;
     protected ContactFilter2D contactFilter; //used to handle collisions when layers are involved
-    protected RaycastHit2D[] hitBuffer = new RaycastHit2D[16]; 
     protected List<RaycastHit2D> hitBufferList = new List<RaycastHit2D>(); //only has the RaycastHit2Ds that hit something
 
     protected const float minMoveDistance = 0.001f;
@@ -37,12 +36,12 @@ public class GravityObject : PhysicsObject
 
     private void Awake()
     {
-        rb2d = GetComponent<Rigidbody2D>();
-        contactFilter.useTriggers = false; //makes it ignore colliders with isTrigger enabled
-        contactFilter.SetLayerMask(Physics2D.GetLayerCollisionMask(gameObject.layer)); //sets the layermask to the layers the current gameobjects layer can collide with
+        rb2d = GetComponent<Rigidbody2D>(); //får rigidbody komponentet og gemmer det i en variabel
+        contactFilter.useTriggers = false; //får den til at ignorære colliders med isTrigger sat til true
+        contactFilter.SetLayerMask(Physics2D.GetLayerCollisionMask(gameObject.layer)); //sætter layermask til de lag gameobjectet kan kollidere med
         contactFilter.useLayerMask = true;
 
-        //for finding bottom point of the rigidbody2d
+        //finder bund punktet af en rigidbody2d
         List<Collider2D> colliders = new List<Collider2D>();
         rb2d.GetAttachedColliders(colliders);
 
@@ -59,7 +58,7 @@ public class GravityObject : PhysicsObject
 
     private void FixedUpdate()
     {
-        velocity += gravityModifier * Physics2D.gravity * Level.current.gravity * Time.deltaTime; //udregner tyngdekræften for objektet
+        velocity += gravityModifier * Physics2D.gravity * Time.deltaTime; //udregner tyngdekræften for objektet
         velocity.x = targetVelocity.x; //tilføjer horizontal bevægelse baseret på targetVelocity
 
         grounded = false; //er sat flask her, og så sat sandt i Movement hvis spilleren kollidere med jorden
@@ -105,12 +104,8 @@ public class GravityObject : PhysicsObject
 
         if (distance > minMoveDistance)
         {
-            int count = rb2d.Cast(moveAmount, contactFilter, hitBuffer, distance + shellRadius); //caster alle en rigdigdbodys collidere i en hvis renting med en hvis mængde
             hitBufferList.Clear();
-            for (int i = 0; i < count; i++)
-            {
-                hitBufferList.Add(hitBuffer[i]);
-            }
+            rb2d.Cast(moveAmount, contactFilter, hitBufferList, distance + shellRadius); //caster alle en rigdigdbodys collidere i en hvis renting med en hvis mængde
 
             //til kollision actions
             currentHits.Clear();

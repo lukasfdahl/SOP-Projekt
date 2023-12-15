@@ -11,7 +11,7 @@ public class PhysicsObject : MonoBehaviour
     public Action<GameObject> onCollisionStay;
     public Action<GameObject> onCollisionExit;
 
-    //collision with hitTag actions
+    //collision med bestemte tags
     public Dictionary<string, Action<GameObject>> onTagCollisionEnter = new Dictionary<string, Action<GameObject>>();
     public Dictionary<string, Action<GameObject>> onTagCollisionStay = new Dictionary<string, Action<GameObject>>();
     public Dictionary<string, Action<GameObject>> onTagCollisionExit = new Dictionary<string, Action<GameObject>>();
