@@ -168,4 +168,11 @@ public class PlayerController : GravityObject
         transform.position = respawnPosition;
         velocity = Vector2.zero;
     }
+
+    private void OnDisable()
+    {
+        StopAllCoroutines();
+        input.Player.Jump.started -= Jump;
+        input.Player.Jump.canceled -= JumpCancel;
+    }
 }

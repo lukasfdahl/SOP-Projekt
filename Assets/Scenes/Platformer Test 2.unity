@@ -606,19 +606,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   minGroundNormalY: 0.65
-  gravityModifier: 4
+  gravityModifier: 3
   terminalVelocityY: 80
-  stepHeight: 0.25
+  stepHeight: 0.5
   maxSpeed: 6
-  acceleration: 6
-  slipCorrection: 6
+  acceleration: 5
+  slipCorrection: 4
   turnAroundRate: 3
-  InitialJumpSpeed: 16
-  coyoteTime: 0.15
-  jumpQueueTime: 0.075
+  InitialJumpSpeed: 14
+  coyoteTime: 0.3
+  jumpQueueTime: 0.4
   jumpCancelRate: 0.5
-  normalGravity: 4
-  cancelGravity: 4
+  normalGravity: 3
+  cancelGravity: 5
 --- !u!61 &148424965
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -733,7 +733,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 0.6088037, g: 1, b: 0.4292453, a: 1}
+  m_Color: {r: 0.13705944, g: 0.8301887, b: 0.82360494, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0

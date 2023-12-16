@@ -606,17 +606,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   minGroundNormalY: 0.65
-  gravityModifier: 4
+  gravityModifier: 5
   terminalVelocityY: 80
-  stepHeight: 0.25
+  stepHeight: 0
   maxSpeed: 6
-  acceleration: 6
-  slipCorrection: 6
-  turnAroundRate: 3
+  acceleration: 100000000
+  slipCorrection: 100000000
+  turnAroundRate: 1
   InitialJumpSpeed: 16
-  coyoteTime: 0.15
-  jumpQueueTime: 0.075
-  jumpCancelRate: 0.5
+  coyoteTime: 0
+  jumpQueueTime: 0
+  jumpCancelRate: 1
   normalGravity: 4
   cancelGravity: 4
 --- !u!61 &148424965
@@ -733,7 +733,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 0.6088037, g: 1, b: 0.4292453, a: 1}
+  m_Color: {r: 0.8962264, g: 0.7340834, b: 0.12259703, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0

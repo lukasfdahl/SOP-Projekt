@@ -30,7 +30,8 @@ public class GravityObject : PhysicsObject
 
     #region collision Actions
     protected List<GameObject> currentHits = new List<GameObject>();
-    protected List<GameObject> prevHits = new List<GameObject>();
+    protected List<GameObject> prevHitsX = new List<GameObject>();
+    protected List<GameObject> prevHitsY = new List<GameObject>();
     #endregion
 
 
@@ -162,15 +163,6 @@ public class GravityObject : PhysicsObject
 
 
         #region collisionActions
-        //for at få en liste af alle de kollidere der var collideret med sidste update
-        List<GameObject> prevCollisions = new List<GameObject>();
-
-        foreach (GameObject hit in prevHits)
-        {
-            prevCollisions.Add(hit);
-        }
-
-
         foreach (GameObject hit in currentHits)
         {
             string hitTag = hit.tag;
@@ -178,7 +170,7 @@ public class GravityObject : PhysicsObject
             PhysicsObject other = hit.GetComponent<PhysicsObject>();
             bool isCollidingWithPhysicsObject = other != null;
 
-            if (prevCollisions.Contains(hit))
+            if (prevHitsX.Contains(hit) || prevHitsY.Contains(hit))
             {
                 //kollsion for dette objeckt
                 //for at køre hitTag kollisions systemet
@@ -204,9 +196,10 @@ public class GravityObject : PhysicsObject
                         other.onCollisionStay(gameObject);
                 }
 
-
-                prevHits.Remove(hit);
-                prevCollisions.Remove(hit);
+                if (yMovement)
+                    prevHitsX.Remove(hit);
+                else
+                    prevHitsY.Remove(hit);
             }
             else
             {
@@ -235,42 +228,85 @@ public class GravityObject : PhysicsObject
             }
         }
 
-        foreach (GameObject hit in prevHits)
+        if (yMovement)
         {
-            //for at sikre at exit kun bliver kørt hvis objektet forlader kollideren fuldkommen. køre ikke hvis det bare er hit pisitionen der ændre sig
-            if (prevCollisions.Contains(hit))
+            foreach (GameObject hit in prevHitsX)
             {
-                string hitTag = hit.tag;
-
-                PhysicsObject other = hit.GetComponent<PhysicsObject>();
-                bool isCollidingWithPhysicsObject = other != null;
-
-                //for at køre hitTag kollisions systemet
-                if (onTagCollisionExit.ContainsKey(hitTag))
+                //for at sikre at exit kun bliver kørt hvis objektet forlader kollideren fuldkommen. køre ikke hvis det bare er hit pisitionen der ændre sig
+                if (prevHitsX.Contains(hit) || prevHitsY.Contains(hit))
                 {
-                    onTagCollisionExit[hitTag](hit);
-                }
+                    string hitTag = hit.tag;
 
-                //for at køre normal kollision
-                if (onCollisionExit != null)
-                    onCollisionExit(hit);
+                    PhysicsObject other = hit.GetComponent<PhysicsObject>();
+                    bool isCollidingWithPhysicsObject = other != null;
 
-
-                if (isCollidingWithPhysicsObject)
-                {
                     //for at køre hitTag kollisions systemet
-                    if (other.onTagCollisionExit.ContainsKey(tag))
+                    if (onTagCollisionExit.ContainsKey(hitTag))
                     {
-                        other.onTagCollisionExit[tag](gameObject);
+                        onTagCollisionExit[hitTag](hit);
                     }
+
                     //for at køre normal kollision
-                    if (other.onCollisionExit != null)
-                        other.onCollisionExit(gameObject);
+                    if (onCollisionExit != null)
+                        onCollisionExit(hit);
+
+
+                    if (isCollidingWithPhysicsObject)
+                    {
+                        //for at køre hitTag kollisions systemet
+                        if (other.onTagCollisionExit.ContainsKey(tag))
+                        {
+                            other.onTagCollisionExit[tag](gameObject);
+                        }
+                        //for at køre normal kollision
+                        if (other.onCollisionExit != null)
+                            other.onCollisionExit(gameObject);
+                    }
                 }
             }
-
-            prevHits = new List<GameObject>(currentHits);
         }
+        else
+        {
+            foreach (GameObject hit in prevHitsY)
+            {
+                //for at sikre at exit kun bliver kørt hvis objektet forlader kollideren fuldkommen. køre ikke hvis det bare er hit pisitionen der ændre sig
+                if (prevHitsX.Contains(hit) || prevHitsY.Contains(hit))
+                {
+                    string hitTag = hit.tag;
+
+                    PhysicsObject other = hit.GetComponent<PhysicsObject>();
+                    bool isCollidingWithPhysicsObject = other != null;
+
+                    //for at køre hitTag kollisions systemet
+                    if (onTagCollisionExit.ContainsKey(hitTag))
+                    {
+                        onTagCollisionExit[hitTag](hit);
+                    }
+
+                    //for at køre normal kollision
+                    if (onCollisionExit != null)
+                        onCollisionExit(hit);
+
+
+                    if (isCollidingWithPhysicsObject)
+                    {
+                        //for at køre hitTag kollisions systemet
+                        if (other.onTagCollisionExit.ContainsKey(tag))
+                        {
+                            other.onTagCollisionExit[tag](gameObject);
+                        }
+                        //for at køre normal kollision
+                        if (other.onCollisionExit != null)
+                            other.onCollisionExit(gameObject);
+                    }
+                }
+            }
+        }
+
+        if (yMovement)
+            prevHitsY = new List<GameObject>(currentHits);
+        else
+            prevHitsX = new List<GameObject>(currentHits);
 
         #endregion
 

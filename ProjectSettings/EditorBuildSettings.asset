@@ -6,6 +6,15 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/Platformer Test.unity
+    guid: 0c8ff1b6511c8dc47932f56380e95bc7
+  - enabled: 1
+    path: Assets/Scenes/Platformer Test 1.unity
+    guid: a3041e5d2e6dd494583bd4bdb01d8836
+  - enabled: 1
+    path: Assets/Scenes/Platformer Test 2.unity
+    guid: d679d5f57597ffe4cb7118ad4fc57587
+  - enabled: 0
     path: Assets/Scenes/SampleScene.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
   m_configObjects: {}
